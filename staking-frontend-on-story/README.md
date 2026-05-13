@@ -1,35 +1,35 @@
-## Story Staking Frontend
+## Vault Frontend
 
-Next.js frontend for your Story testnet staking dApp.
+Next.js frontend for the vault dApp.
 
-Features:
+Demo URL: [http://118.178.110.227:3000/](http://118.178.110.227:3000/)
 
-- MetaMask wallet connection
-- Top navigation with `Staking`, `Withdraw`, `Info`
-- Stake and withdraw transaction flow through wallet signature
-- Gas estimation before wallet confirmation
-- Account info panel (connected account, shares, vault assets)
+### Features
+
+- Multi-wallet connection flow
+- Stake and withdraw transactions via wallet signature
+- Wallet snapshot (shares, my assets, total assets)
 - PostgreSQL-backed transaction history (`Info` page)
 
-## Getting Started
-
-Install dependencies:
+## 1) Local Development
 
 ```bash
 npm install
-```
-
-Create environment file:
-
-```bash
 cp .env.example .env
 ```
 
-Set your vault address:
+Set `.env`:
 
 ```bash
 NEXT_PUBLIC_VAULT_ADDRESS=0xYourVaultProxyAddress
-DATABASE_URL=yourPostgresql://username:password@host:port/database
+DATABASE_URL=postgresql://postgres:your_password@127.0.0.1:5432/staking_story
+```
+
+Initialize DB:
+
+```bash
+npm run db:init
+npm run db:check
 ```
 
 Run dev server:
@@ -40,7 +40,38 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## Scripts
+## 2) Server Deployment (Alibaba Cloud / CentOS)
+
+Follow this exact order:
+
+1. Install dependencies
+   ```bash
+   npm install
+   ```
+2. Configure `.env` (`NEXT_PUBLIC_VAULT_ADDRESS`, `DATABASE_URL`)
+3. Initialize DB
+   ```bash
+   npm run db:init
+   npm run db:check
+   ```
+4. Build and start manually first
+   ```bash
+   npm run build
+   npm run start
+   ```
+5. Verify service
+   ```bash
+   curl -I http://127.0.0.1:3000
+   ```
+6. After manual validation, host with PM2
+   ```bash
+   npm i -g pm2
+   pm2 start "npm run start" --name staking-frontend
+   pm2 save
+   pm2 startup
+   ```
+
+## 3) Scripts
 
 ```bash
 npm run dev
@@ -52,63 +83,18 @@ npm run db:check
 npm run tx:query -- --limit 50
 ```
 
-## Database Setup (PostgreSQL)
-
-The frontend stores transaction history in PostgreSQL (server-side only).
-
-### 1) Configure connection
-
-Set `DATABASE_URL` in `.env`:
+Transaction query examples:
 
 ```bash
-DATABASE_URL=postgresql://postgres:your_password@localhost:5432/staking_story
-```
-
-### 2) Create database and schema
-
-Run:
-
-```bash
-npm run db:init
-```
-
-This script will:
-
-- Create the target database if it does not exist
-- Create the `transactions` table
-- Create index `idx_transactions_account_time`
-
-### 3) Verify initialization
-
-Run:
-
-```bash
-npm run db:check
-```
-
-Expected output includes:
-
-- `database_exists: true`
-- `transactions_table: transactions`
-
-### 4) Query transaction records
-
-```bash
-# Query latest records
-npm run tx:query -- --limit 50
-
-# Query by account
 npm run tx:query -- --account 0xYourAddress
-
-# Query by tx hash
 npm run tx:query -- --hash 0xYourTxHash
 ```
 
-## Notes
+## 4) Vault Interface Required
 
-- MetaMask must be installed in your browser.
-- The frontend expects the Vault to expose:
-  - `depositEth(address receiver)`
-  - `withdrawEth(uint256 assets, address receiver)`
-  - `balanceOf(address owner)`
-  - `totalAssets()`
+The frontend expects Vault to expose:
+
+- `depositEth(address receiver)`
+- `withdrawEth(uint256 assets, address receiver)`
+- `balanceOf(address owner)`
+- `totalAssets()`
