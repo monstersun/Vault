@@ -3,7 +3,7 @@
 This workspace contains two projects:
 
 - `StakingContractOnStory`: Hardhat smart contracts (UUPS + ERC4626 Vault + WETH)
-- `staking-frontend-on-story`: Next.js frontend with MetaMask wallet flow
+- `staking-frontend-on-story`: Next.js frontend with multi-wallet connection flow
 
 Recommended repository layout for one GitHub repo:
 
